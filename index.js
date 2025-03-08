@@ -46,6 +46,35 @@ async function run() {
         const result = await jobsCollection.findOne(query);
         res.send(result);
     })
+
+
+    // job application apis
+
+    app.get('/job-application', async (req, res) => {
+      const email = req.query.email;
+      const query = { applicant_email: email }
+      const result = await jobApplicationCollection.find(query).toArray();
+
+      for (const application of result) {
+        console.log(application.job_id)
+        const query1 = { _id: new ObjectId(application.job_id) }
+        const job = await jobsCollection.findOne(query1);
+        if(job){
+            application.title = job.title;
+            application.location = job.location;
+            application.company = job.company;
+            application.company_logo = job.company_logo;
+        }
+    }
+      res.send(result);
+    })
+
+
+    app.post('/job-applications', async (req, res) => {
+      const application = req.body;
+      const result = await jobApplicationCollection.insertOne(application);
+      res.send(result);
+  })
   });
 
 
