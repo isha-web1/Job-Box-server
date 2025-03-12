@@ -74,6 +74,16 @@ async function run() {
 
     });
 
+    app.post('/logout', (req, res) => {
+      res
+          .clearCookie('token', {
+              httpOnly: true,
+              secure: false,
+              
+          })
+          .send({ success: true })
+  })
+
 
     // jobs related APIs
      app.get('/jobs',logger, async (req, res) => {
