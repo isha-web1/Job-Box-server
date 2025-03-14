@@ -7,7 +7,7 @@ require('dotenv').config()
 const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion,ObjectId  } = require('mongodb');
 
-app.use(cors({origin: 'http://localhost:5173', // Replace with your frontend's origin
+app.use(cors({origin: ['http://localhost:5173','https://job-portal-ccf44.web.app','https://job-portal-ccf44.firebaseapp.com'], // Replace with your frontend's origin
   credentials: true, // Allow cookies
   allowedHeaders: ['Content-Type', 'Authorization']}))
 app.use(express.json())
@@ -53,8 +53,8 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
      // jobs related apis
      const jobsCollection = client.db('jobBox').collection('jobs');
@@ -68,7 +68,8 @@ async function run() {
         res
             .cookie('token', token, {
                 httpOnly: true,
-                secure: false, //for localhost
+               secure: process.env.NODE_ENV === 'production',
+               sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
             })
             .send({ success: true })
 
@@ -78,7 +79,8 @@ async function run() {
       res
           .clearCookie('token', {
               httpOnly: true,
-              secure: false,
+              secure: process.env.NODE_ENV === 'production',
+              sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
               
           })
           .send({ success: true })
